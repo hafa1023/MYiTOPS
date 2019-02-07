@@ -6,13 +6,13 @@ import threading
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-GPIO.setup(12, GPIO.OUT)
-GPIO.setup(11, GPIO.IN)
+GPIO.setup(12, GPIO.IN, GPIO.PUD_DOWN)
+GPIO.setup(40, GPIO.IN, GPIO.PUD_DOWN)
 print("init GBIOs")
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print(GPIO.input(11))
-   
+print("Start status Pin 11: " + str(GPIO.input(40)))
+print("Start status Pin 12: " + str(GPIO.input(12)))   
 
 def comToServer():
     try:
@@ -51,8 +51,12 @@ def comToServer():
            print ("NO Connection to etaNet. Please check your connection to server!")
 
         #GPIO.output(12, not GPIO.input(12))    
-while (not GPIO.input(11)):
-    time.sleep(0.1)
-    print("Stop Button:")
-    print(GPIO.input(11))
-comToServer()     
+while (not GPIO.input(40)):
+    time.sleep(0.2)
+    print("Start status Pin 11: " + str(GPIO.input(40)))
+    print("Start status Pin 12: " + str(GPIO.input(12))) 
+    if(GPIO.input(12)):
+        comToServer()  
+    #print(GPIO.input(11))
+    #print(GPIO.input(12))
+print("App. is stoped with red button.")

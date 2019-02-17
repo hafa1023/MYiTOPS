@@ -5,6 +5,13 @@ stuffaboutcode.com
 Additional code added by Ferhat Aslan (University of Applied Science)
 """
 
+'''
+Please enter the IP address of the server here. Change the transfer rate if desired.
+'''
+ipAdress = '192.168.178.45'
+# value in seconds
+TRANSFERRATE = 5
+
 import RPi.GPIO as GPIO
 from time import sleep
 import socket
@@ -12,7 +19,7 @@ from PySide import QtNetwork, QtCore, QtGui
 import _thread
 GPIO.setmode(GPIO.BCM)
 
-ipAdress = '192.168.178.20'
+
 
 class MYiTOPS:
 
@@ -41,6 +48,10 @@ class MYiTOPS:
         self.led5Pin = led5Pin
         self.pushbutton1Callback = pushbutton1Callback
         self.pushbutton2Callback = pushbutton2Callback
+        self.volume = 0
+        self.push1 = False
+        self.push2 = False
+        self.laverSwitch = 0
 
         self.loop = True
 
@@ -58,6 +69,9 @@ class MYiTOPS:
         GPIO.setup(led3Pin, GPIO.OUT)
         GPIO.setup(led4Pin, GPIO.OUT)
         GPIO.setup(led5Pin, GPIO.OUT)
+    
+    def getValues(self):
+        return str(self.laverSwitch) + ", '"+ str(self.push1)+ "', '" + str(self.push2) + "', "+ str(self.volume)
 
     def start(self):
         GPIO.add_event_detect(self.clockPin, GPIO.FALLING, callback=self._clockCallback, bouncetime=self.DEBOUNCE)
@@ -70,37 +84,41 @@ class MYiTOPS:
         GPIO.remove_event_detect(self.switchPin)
         GPIO.remove_event_detect(self.pushbutton1Pin)
         GPIO.remove_event_detect(self.pushbutton2Pin)
-
+        
     
     def _clockCallback(self, pin):
         if GPIO.input(self.clockPin) == 0:
-            self.rotaryCallback(GPIO.input(self.dataPin))
-        """
-            data = GPIO.input(self.dataPin)
-            if data == 1:
-                self.rotaryCallback(self.ANTICLOCKWISE)
-            else:
-                self.rotaryCallback(self.CLOCKWISE)
+            #self.rotaryCallback(GPIO.input(self.dataPin))
         
-        self.rotaryCallback(GPIO.input(self.dataPin))
-        """
+            data = GPIO.input(self.dataPin)
+            if data == 0 and self.volume < 20:
+                self.volume += 1
+            elif data == 1 and self.volume > 0:
+                self.volume -= 1
+        print (self.volume)
+        
 
     def _switchCallback(self, pin):
-        """
-        if GPIO.input(self.switchPin) == 0:
-            self.switchCallback()
-        """
-        self.switchCallback(pin)
+        self.volume = 0
+        print ("Volume is set to zero.")
+        print (self.volume)
+        #self.switchCallback(pin)
         
     def getLaverSwitch(self):
-        return GPIO.input(self.laverSwitchPin)
+        self.laverSwitch = GPIO.input(self.laverSwitchPin)
+        return self.laverSwitch
  
         
     def _pushbutton1Callback(self, pin):
-        self.pushbutton1Callback(pin)
+        if not GPIO.input(self.laverSwitchPin):
+            self.pushbutton1Callback(pin)
+        self.push1 = not self.push1
+        print(self.push1)
 
     def _pushbutton2Callback(self, pin):
-        self.pushbutton2Callback(pin)
+        #self.pushbutton2Callback(pin)
+        self.push2 = not self.push2
+        print(self.push2)
         
     def setLed1(self, on):
         if on: 
@@ -144,7 +162,8 @@ class MYiTOPS:
 
 if __name__ == "__main__":
     
-    
+    byteMessageList = []
+    values = "0, 0, 0, 0, 0"
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     print ('Program start.')
@@ -171,27 +190,16 @@ if __name__ == "__main__":
         
     def pushbutton2(pin):
         print ("button connected to pin:{} pressed".format(pin))
-    
-        
-    MYiTOPS = MYiTOPS(CLOCKPIN, DATAPIN, SWITCHPIN, LAVERSWITCH, PUSHBUTTON1, PUSHBUTTON2, LED1, LED2, LED3, LED4, LED5,
-                      rotaryChange, switchPressed, pushbutton1, pushbutton2)
-
-    print ('Launch switch monitor class.')
-
-    MYiTOPS.start()
-    print ('Start program loop...')
-'''   
-    def comToServer():
+   
+    def comToServer(values):
         try:
             on = '1'
             off = '0'      
-            #name = "'RemoteRPIGroupN'"
-            #header = "('Time Stamp', 'Hard key 1', 'Hard key 2', 'Hard key 3', 'KY-040-Encoder')"
-            #values = " VALUES ('2018-12-22 14:09:36', 1, 0, 0, 123);"
-            message = "'CHP- SenerTec Dachs G5.52' ('Time Stamp - Heat Meter 1', 'Th. Power [W] - Heat Meter 1', 'Water Flow [m^3/h] - Heat Meter 1', 'T_Flow [°C] - Heat Meter 1', 'T_Return [°C] - Heat Meter 1','Time Stamp - Heat Meter 2', 'Th. Power [W] - Heat Meter 2', 'Water Flow [m^3/h] - Heat Meter 2','T_Flow [°C] - Heat Meter 2', 'T_Return [°C] - Heat Meter 2') VALUES ('2018-02-23 14:09:36', 12000.2, 12.1258, 22.14, 22.44, '2018-12-11 14:09:36', 12000.1, 11.1258, 21.14, 21.44)"
-            #message = "{} ({})".format(name, header + values)
+            header = "'MYiTOPS-RPI-Client3' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
+            message = "{} ({})".format(header, values)
+            #message = "E5"
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(1.0)
+            s.settimeout(10.0)
             s.connect((ipAdress, 50005))
             print ("Connection etaNet is done")
             block = QtCore.QByteArray()
@@ -204,56 +212,99 @@ if __name__ == "__main__":
             block2 = QtCore.QByteArray()
             into = QtCore.QDataStream(block2, QtCore.QIODevice.ReadWrite)
             into.setVersion(QtCore.QDataStream.Qt_4_0)
-            #Die länge der erwarteten Nachicht sollte dynamisch sein!
-            #Keine Sonderzeichen verwenden bzw. empfangen!!!! 
             message = s.recv(1024)
-            byteMessageList = list(message)
+            byteMessageList = list(message.decode('ascii'))
             strMessage = ''.join(str(x) for x in byteMessageList)
-            print(byteMessageList)
-            print(strMessage)
-
-            s.close()                    
+            #print(byteMessageList)
+            #print(byteMessageList[5] + byteMessageList[7])
+            #print(strMessage)
+            s.close()
+            return message
         except:
                print ("NO Connection to etaNet. Please check your connection to server!")
     
     def boardThread():
         try:
+            MYiTOPS.setLed1(True)
+            sleep(0.2)
+            MYiTOPS.setLed1(False)
+            MYiTOPS.setLed2(True)
+            sleep(0.2)
+            MYiTOPS.setLed2(False)
+            MYiTOPS.setLed3(True)
+            sleep(0.2)
+            MYiTOPS.setLed3(False)
+            MYiTOPS.setLed4(True)
+            sleep(0.2)
+            MYiTOPS.setLed4(False)
+            MYiTOPS.setLed5(True)
+            sleep(0.2)
+            MYiTOPS.setLed5(False)
             while MYiTOPS.getExit():
-               sleep(0.2)
-          #      MYiTOPS.setLed1(MYiTOPS.getLaverSwitch())
-        except Exception as e:
-            print ("Thread Board: ")
+                sleep(0.2)
+                status = MYiTOPS.getLaverSwitch()
+                if status:
+                    MYiTOPS.setLed1(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+
+
+        except:
+                    print ("Thread Board: ")
+        finally:
+            print ('Stopping GPIO monitoring...')
+            MYiTOPS.stop()
+            GPIO.cleanup()
+            print ('Program ended.')
+            _thread.exit_thread()
 
     def networkThread():
         try:
             while MYiTOPS.getExit():
-               sleep(1)
-           #     if(MYiTOPS.getLaverSwitch()):
-            #        comToServer()
-        except Exception as e:
+                sleep(TRANSFERRATE)
+                #print ("Network Thread is runing")
+                if(MYiTOPS.getLaverSwitch()):
+                    data = comToServer(MYiTOPS.getValues())
+                    byteMessageList = list(data.decode('ascii'))
+                    #print(byteMessageList)
+                    
+                    if byteMessageList[5] == 'E' and  byteMessageList[7] == '5':
+                        pass
+
+                    elif byteMessageList[5] == 'N':
+                        print(byteMessageList[17])
+                        
+                        MYiTOPS.setLed5(int(byteMessageList[17]))
+                        MYiTOPS.setLed2(int(byteMessageList[23]))
+                        MYiTOPS.setLed3(int(byteMessageList[29]))
+                        MYiTOPS.setLed4(int(byteMessageList[35]))
+                        MYiTOPS.setLed5(int(byteMessageList[41]))
+                    
+                    else:
+                        print("Wrong message! Please check your conection.")
+                    
+  
+                      
+                    
+        except:
             print ("Thread Network: ")
+        finally:
+            print ('Stopping transfer of data')
+
+        
+MYiTOPS = MYiTOPS(CLOCKPIN, DATAPIN, SWITCHPIN, LAVERSWITCH, PUSHBUTTON1, PUSHBUTTON2, LED1, LED2, LED3, LED4, LED5,
+                  rotaryChange, switchPressed, pushbutton1, pushbutton2)
+
+print ('MYiTOPS Remote Control Client.')
+
+MYiTOPS.start()
+
                                       
 try:
     _thread.start_new_thread(boardThread, ())
     _thread.start_new_thread(networkThread, ())
 except:
     print ("Error: unable to start thread")
-'''
-try:
-    while MYiTOPS.getExit():
-        sleep(0.2)
-        status = MYiTOPS.getLaverSwitch()
-        MYiTOPS.setLed1(status)
-        MYiTOPS.setLed2(status)
-        MYiTOPS.setLed3(status)
-        MYiTOPS.setLed4(status)
-        MYiTOPS.setLed5(status)
-except:
-            print ("Thread Board: ") 
- 
-finally:
-    print ('Stopping GPIO monitoring...')
-    MYiTOPS.stop()
-    GPIO.cleanup()
-    print ('Program ended.')
+
+#boardThread()
     

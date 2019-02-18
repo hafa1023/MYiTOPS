@@ -8,9 +8,9 @@ Additional code added by Ferhat Aslan (University of Applied Science)
 '''
 Please enter the IP address of the server here. Change the transfer rate if desired.
 '''
-ipAdress = '192.168.178.45'
+ipAdress = '192.168.178.20'
 # value in seconds
-TRANSFERRATE = 1
+TRANSFERRATE = 0.2
 
 import RPi.GPIO as GPIO
 from time import sleep
@@ -19,7 +19,18 @@ from PySide import QtNetwork, QtCore, QtGui
 import _thread
 GPIO.setmode(GPIO.BCM)
 
-
+class Stopping:
+    def __init__(self, bool, rider):
+        self.exit = bool
+        self.rider = rider
+    def getStop(self):
+        return self.exit
+    def setStop(self, bool):
+        self.exit = bool
+    def getRider(self):
+        return self.rider
+    def setRider(self, bool):
+        self.rider = bool
 
 class MYiTOPS:
 
@@ -113,12 +124,12 @@ class MYiTOPS:
         if not GPIO.input(self.laverSwitchPin):
             self.pushbutton1Callback(pin)
         self.push1 = not self.push1
-        print(self.push1)
+        #print(self.push1)
 
     def _pushbutton2Callback(self, pin):
         #self.pushbutton2Callback(pin)
         self.push2 = not self.push2
-        print(self.push2)
+        #print(self.push2)
         
     def setLed1(self, on):
         if on: 
@@ -164,7 +175,6 @@ if __name__ == "__main__":
     
     byteMessageList = []
     values = "0, 0, 0, 0, 0"
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     print ('Program start.')
 
@@ -195,7 +205,7 @@ if __name__ == "__main__":
         try:
             on = '1'
             off = '0'      
-            header = "'MYiTOPS-RPI-Client3' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
+            header = "'MYiTOPS-RPI-Client' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
             message = "{} ({})".format(header, values)
             #message = "E5"
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -223,6 +233,109 @@ if __name__ == "__main__":
         except:
                print ("NO Connection to etaNet. Please check your connection to server!")
     
+    def knightRider():
+        
+        MYiTOPS.setLed1(False)
+        MYiTOPS.setLed2(False)
+        MYiTOPS.setLed3(False)
+        MYiTOPS.setLed4(False)
+        MYiTOPS.setLed5(False)
+        cont = False
+        
+        try:
+            while Exit.getStop():
+                #print(Exit.getRider())
+                if(Exit.getRider()):
+                    cont = True
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(True)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(False)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(True)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(True)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(True)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                    sleep(0.2)
+                    MYiTOPS.setLed1(True)
+                    MYiTOPS.setLed2(False)
+                    MYiTOPS.setLed3(False)
+                    MYiTOPS.setLed4(False)
+                    MYiTOPS.setLed5(False)
+                if(not Exit.getRider() and cont):
+                    MYiTOPS.setLed1(False)
+                    cont = False
+                
+
+
+        except:
+            print ("Knight Rider Thread stopped")
+        finally:
+            print("Knight Rider is done")
+    
+        
     def boardThread():
         try:
             MYiTOPS.setLed1(True)
@@ -240,60 +353,62 @@ if __name__ == "__main__":
             MYiTOPS.setLed5(True)
             sleep(0.2)
             MYiTOPS.setLed5(False)
-            while MYiTOPS.getExit():
-                sleep(0.2)
-                status = MYiTOPS.getLaverSwitch()
-                if status:
-                    MYiTOPS.setLed1(True)
-                    sleep(0.2)
-                    MYiTOPS.setLed1(False)
-
+            
+            while Exit.getStop():
+                sleep(0.1)
 
         except:
-                    print ("Thread Board: ")
+            print ("Thread Board: ")
         finally:
             print ('Stopping GPIO monitoring...')
             MYiTOPS.stop()
             GPIO.cleanup()
-            print ('Program ended.')
-            _thread.exit_thread()
 
     def networkThread():
+        once = True
         try:
             while MYiTOPS.getExit():
                 sleep(TRANSFERRATE)
                 #print ("Network Thread is runing")
-                if(MYiTOPS.getLaverSwitch()):
+                if(MYiTOPS.getLaverSwitch() or once):
+                    if MYiTOPS.getLaverSwitch() == True:
+                        once = True
+                        #print('once = True')
+                    if MYiTOPS.getLaverSwitch() == False:
+                        once = False
+                        #print('once = False')
+                    
                     data = comToServer(MYiTOPS.getValues())
                     byteMessageList = list(data.decode('ascii'))
-                    #print(byteMessageList)
+                    parameter = len(byteMessageList)== 36
+                    #print(parameter)
+                    
                     
                     if byteMessageList[5] == 'E' and  byteMessageList[7] == '5':
                         pass
 
-                    elif byteMessageList[5] == 'N':
-                        print(byteMessageList[17])
-                        
-                        MYiTOPS.setLed5(int(byteMessageList[17]))
-                        MYiTOPS.setLed2(int(byteMessageList[23]))
-                        MYiTOPS.setLed3(int(byteMessageList[29]))
-                        MYiTOPS.setLed4(int(byteMessageList[35]))
-                        MYiTOPS.setLed5(int(byteMessageList[41]))
+                    elif parameter:
+                        #print(int(byteMessageList[5]) == 1)
+                        Exit.setRider(int(byteMessageList[5]) == 1)
+                        if(int(byteMessageList[5]) == 0):
+                            MYiTOPS.setLed1(int(byteMessageList[11]))
+                            MYiTOPS.setLed2(int(byteMessageList[17]))
+                            MYiTOPS.setLed3(int(byteMessageList[23]))
+                            MYiTOPS.setLed4(int(byteMessageList[29]))
+                            MYiTOPS.setLed5(int(byteMessageList[35]))
+
                     
                     else:
                         print("Wrong message! Please check your conection.")
-                    
-  
-                      
-                    
-        except:
-            print ("Thread Network: ")
+        #except:
+            #print ("Communication via the network could not be started.")
         finally:
             print ('Stopping transfer of data')
-
+            Exit.setStop(False)
         
 MYiTOPS = MYiTOPS(CLOCKPIN, DATAPIN, SWITCHPIN, LAVERSWITCH, PUSHBUTTON1, PUSHBUTTON2, LED1, LED2, LED3, LED4, LED5,
                   rotaryChange, switchPressed, pushbutton1, pushbutton2)
+Exit= Stopping(True, False)
 
 print ('MYiTOPS Remote Control Client.')
 
@@ -303,8 +418,8 @@ MYiTOPS.start()
 try:
     _thread.start_new_thread(boardThread, ())
     _thread.start_new_thread(networkThread, ())
+    _thread.start_new_thread(knightRider, ())
+    
+
 except:
     print ("Error: unable to start thread")
-
-#boardThread()
-    

@@ -12,6 +12,7 @@
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="CBSControlling.vi" Type="VI" URL="../CBSControlling.vi"/>
 		<Item Name="DataHandlerMYiTOPS.lvclass" Type="LVClass" URL="../classes/DataHandlerMYiTOPS.lvclass"/>
+		<Item Name="PathDialog.vi" Type="VI" URL="../subvi/PathDialog.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="Application Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Application Directory.vi"/>

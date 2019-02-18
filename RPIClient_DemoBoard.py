@@ -10,7 +10,7 @@ Please enter the IP address of the server here. Change the transfer rate if desi
 '''
 ipAdress = '192.168.178.45'
 # value in seconds
-TRANSFERRATE = 5
+TRANSFERRATE = 1
 
 import RPi.GPIO as GPIO
 from time import sleep
@@ -201,11 +201,11 @@ if __name__ == "__main__":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(10.0)
             s.connect((ipAdress, 50005))
-            print ("Connection etaNet is done")
+            #print ("Connection etaNet is done")
             block = QtCore.QByteArray()
             out = QtCore.QDataStream(block, QtCore.QIODevice.WriteOnly)
             out.setVersion(QtCore.QDataStream.Qt_4_0)                                
-            print(message)                    
+            #print(message)                    
             out.writeQString(message)             
             s.send(block.data())
             

@@ -205,7 +205,7 @@ if __name__ == "__main__":
         try:
             on = '1'
             off = '0'      
-            header = "'MYiTOPS-RPI-Client' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
+            header = "'MYiTOPS-RPI-Client 2' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
             message = "{} ({})".format(header, values)
             #message = "E5"
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -234,15 +234,8 @@ if __name__ == "__main__":
                print ("NO Connection to etaNet. Please check your connection to server!")
     
     def knightRider():
-        
-        MYiTOPS.setLed1(False)
-        MYiTOPS.setLed2(False)
-        MYiTOPS.setLed3(False)
-        MYiTOPS.setLed4(False)
-        MYiTOPS.setLed5(False)
         cont = False
-        
-        try:
+        try:          
             while Exit.getStop():
                 #print(Exit.getRider())
                 if(Exit.getRider()):
@@ -333,7 +326,7 @@ if __name__ == "__main__":
         except:
             print ("Knight Rider Thread stopped")
         finally:
-            print("Knight Rider is done")
+            print("Knight Rider mode is closed")
     
         
     def boardThread():
@@ -355,7 +348,7 @@ if __name__ == "__main__":
             MYiTOPS.setLed5(False)
             
             while Exit.getStop():
-                sleep(0.1)
+                sleep(0.2)
 
         except:
             print ("Thread Board: ")
@@ -400,8 +393,8 @@ if __name__ == "__main__":
                     
                     else:
                         print("Wrong message! Please check your conection.")
-        #except:
-            #print ("Communication via the network could not be started.")
+        except:
+            print ("Communication via the network could not be started.")
         finally:
             print ('Stopping transfer of data')
             Exit.setStop(False)

@@ -10,7 +10,7 @@ Please enter the IP address of the server here. Change the transfer rate if desi
 '''
 ipAdress = '192.168.178.20'
 # value in seconds
-TRANSFERRATE = 0.02
+TRANSFERRATE = 0.2
 
 import RPi.GPIO as GPIO
 import socket
@@ -199,7 +199,7 @@ if __name__ == "__main__":
         try:
             on = '1'
             off = '0'      
-            header = "'MYiTOPS-RPI-Client 2' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
+            header = "'MYiTOPS-RPI-Client 3' ('Laver Switch', 'Push Button 1', 'Push Button 2', 'Encoder Volume') VALUES "
             message = "{} ({})".format(header, values)
             #message = "E5"
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -323,6 +323,7 @@ if __name__ == "__main__":
                     #print('once = False')
                 
                 data = comToServer(MYiTOPS.getValues())
+                #print (data)
                 byteMessageList = list(data.decode('ascii'))
                 parameter = len(byteMessageList)== 36
                 #print(parameter) 

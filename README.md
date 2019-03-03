@@ -1,4 +1,4 @@
-# MYiTOPS
+# MYiTOPS - Workshop: Remote Control via Cyber-physical Systems
 Implementation of "International Team Oriented Project Studies" in the field of cyberphysical systems in German - Malaysian tandems in Germany and Malaysia in mechatronics and vehicle technology.
 
 ## Set up Remote Control System
@@ -28,6 +28,7 @@ If so far everything is installed, then clone or download [Project-Folder](https
 * Connect your PC with etaNet-Router-Wlan-Network
 * Unzip the .zip file and double-click on the etanet.exe. Accept all windows safety regulations...
 * Chose an Interface IP, that the etaNet-Router gave you and let the port 50005.
+
 The system is programmed so that the corresponding database and its structure is created automatically at startup. You can also use the [DB Browser for SQLite](https://sqlitebrowser.org/). you can find the .db-file in the same directory as the .exe-file of the server.
 
 #### LabVIEW App
@@ -39,7 +40,7 @@ If you have started your RPI (with Rasbian OS), you will find a raspberry icon a
 
 '''
 ipAdress = '192.168.178.XX'
-# value in seconds
+
 TRANSFERRATE = 0.2
 '''
 
